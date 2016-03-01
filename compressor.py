@@ -37,7 +37,7 @@ if not optlist.archiveName:
 			continue
 		m = nameParser.match(word)
 		if m:
-			name = ''.join(m.group(1).split('.')[:-1])
+			name = m.group(1)[:m.group(1).rfind('.')]
 			optlist.archiveName = name
 			break
 	else:
