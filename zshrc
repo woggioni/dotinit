@@ -6,14 +6,6 @@ setopt appendhistory autocd extendedglob notify
 bindkey -e
 # End of lines configured by zsh-newuser-install
 
-export PATH=/home/walter/bin:$PATH
-
-export EDITOR=vim
-
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
-
-OGGIOGIT="ssh://git@oggio88.silksky.com:2022/srv/git"
-
 function svndiff () { svn diff $@ | colordiff }
 
 # Prefer ipython for interactive shell
@@ -113,86 +105,6 @@ extract_archive () {
 
 alias ex=extract_archive
 compdef '_files -g "*.gz *.tgz *.bz2 *.tbz *.zip *.rar *.tar *.lha"' extract_archive    
-
-function parse_name()
-{
-    while getopts ":n:" opt; do
-        case $opt in
-    	n)
-            echo "name is $OPTARG" 
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            ;;
-        esac
-    done
-}
-
-parse_name()
-{
-    local o_name=(-n .)
-    local o_file=()
-    zparseopts -K -D -E -- n:=o_name -name:=o_name i+:=o_file -input+:=o_file h=o_help
-    if [[ $? != 0 || "$o_help" != "" ]]; then
-        echo Usage: $(basename "$0") "[(-n|--name) FILENAME]"
-    fi
-    local name=$o_name[2]
-    if [[ $name = "." ]]; then
-        [[ $1 =~ "(\w+)\.*" ]] 
-        name="$match[1]"
-    fi
-    ifile=o_file
-    fname=$name
-    echo $@ 
-}
-
-
-function dumb_gz() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    fname="$name[1]"
-    if ! type "pigz" > /dev/null; then
-	echo Using parallel compression.. 
-        tar -c "$opts" | pigz > "$fname.tar.gz"
-    else
-        tar -czf "$fname.tar.gz" "$opts"
-    fi
-}
-
-function dumb_xz() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    echo  "$opts" --- "$fname" --- "$name"
-    echo tar -c "$opts" "$fname" "|" pixz ">" "$fname.tar.xz"
-    if ! type "pixz" > /dev/null; then
-	echo Using parallel compression.. 
-	tar -c "$opts" "$fname" | pixz > "$fname.tar.xz"
-    else
-    	tar -cJf "$fname.tar.xz" "$opts" "$fname"
-    fi
-}
-
-function dumb_lzma() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    tar -c --lzma -f  "$name.tar.lzma" "$opts"
-}
-
-function dumb_bzip2() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    tar -cjf  "$name.tar.bz2" "$opts"
-}
-
-function dumb_7z() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    echo 7z a -m0=LZMA2  \"$name.tar.7z\" \"$opts\"
-    7z a -m0=LZMA2  "$name.tar.7z" "$opts"
-}
 
 alias tar.7z="compressor.py -f 7z"
 alias tar.lzma="compressor.py -f lzma"
