@@ -194,9 +194,9 @@ function dumb_7z() {
     7z a -m0=LZMA2  "$name.tar.7z" "$opts"
 }
 
-alias tar.7z=dumb_7z
-alias tar.lzma=dumb_lzma
-alias tar.bz2=dumb_bzip2
-alias tar.gz=dumb_gz
-alias tar.xz=dumb_xz
+alias tar.7z="compressor.py -f 7z"
+alias tar.lzma="compressor.py -f lzma"
+alias tar.bz2="compressor.py -f bz2"
+alias tar.gz="compressor.py -f gz"
+alias tar.xz="compressor.py -f xz"
 alias llh="ls -lh"
