@@ -5,6 +5,7 @@ from subprocess import check_call, CalledProcessError
 import re
 import shutil
 import sys
+import os
 
 class ArgParser(OptionParser):
 
@@ -18,19 +19,19 @@ class ArgParser(OptionParser):
                     except (BadOptionError, AmbiguousOptionError) as e:
                         largs.append(e.opt_str)
 
-usage = "Usage: %prog "
+usage = "Usage: %prog [-o OUTPUT_FILE_NAME_WITHOUT_EXTENSION]"
 parser = ArgParser(usage)
 parser.add_option("-f", "--format", dest="format")
-parser.add_option("-n", "--name", dest="archiveName")
+parser.add_option("-o", "--output", dest="archiveName")
 
 optlist, args = parser.parse_args()
 
 if len(args) < 1:
     parser.print_usage()
     sys.exit(-1)
-if not optlist.format:
-        optlist.format = 'gz'
-if not optlist.archiveName:
+
+
+def establishArchiveName():
     nameParser = re.compile("(?:/?([\w_\\.-]+))+")
     for word in reversed(args):
         if word[0] == '-':
@@ -39,10 +40,17 @@ if not optlist.archiveName:
         if m:
             dotIndex = m.group(1).rfind('.')
             name = m.group(1)[:dotIndex] if dotIndex > 0 else m.group(1)
-            optlist.archiveName = name
-            break
-    else:
-        optlist.archiveName = 'archive'
+            return name
+    return 'archive'
+
+
+if not optlist.format:
+        optlist.format = 'gz'
+if optlist.archiveName:
+    if os.path.exists(optlist.archiveName):
+        optlist.archiveName = os.path.join(optlist.archiveName, establishArchiveName())    
+else:
+    optlist.archiveName = establishArchiveName()    
         
 
 
