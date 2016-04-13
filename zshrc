@@ -6,14 +6,6 @@ setopt appendhistory autocd extendedglob notify
 bindkey -e
 # End of lines configured by zsh-newuser-install
 
-export PATH=/home/walter/bin:$PATH
-
-export EDITOR=vim
-
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
-
-OGGIOGIT="ssh://git@oggio88.silksky.com:2022/srv/git"
-
 function svndiff () { svn diff $@ | colordiff }
 
 # Prefer ipython for interactive shell
@@ -114,89 +106,243 @@ extract_archive () {
 alias ex=extract_archive
 compdef '_files -g "*.gz *.tgz *.bz2 *.tbz *.zip *.rar *.tar *.lha"' extract_archive    
 
-function parse_name()
-{
-    while getopts ":n:" opt; do
-        case $opt in
-    	n)
-            echo "name is $OPTARG" 
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
-            ;;
-        esac
-    done
-}
-
-parse_name()
-{
-    local o_name=(-n .)
-    local o_file=()
-    zparseopts -K -D -E -- n:=o_name -name:=o_name i+:=o_file -input+:=o_file h=o_help
-    if [[ $? != 0 || "$o_help" != "" ]]; then
-        echo Usage: $(basename "$0") "[(-n|--name) FILENAME]"
-    fi
-    local name=$o_name[2]
-    if [[ $name = "." ]]; then
-        [[ $1 =~ "(\w+)\.*" ]] 
-        name="$match[1]"
-    fi
-    ifile=o_file
-    fname=$name
-    echo $@ 
-}
-
-
-function dumb_gz() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    fname="$name[1]"
-    if ! type "pigz" > /dev/null; then
-	echo Using parallel compression.. 
-        tar -c "$opts" | pigz > "$fname.tar.gz"
-    else
-        tar -czf "$fname.tar.gz" "$opts"
-    fi
-}
-
-function dumb_xz() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    echo  "$opts" --- "$fname" --- "$name"
-    echo tar -c "$opts" "$fname" "|" pixz ">" "$fname.tar.xz"
-    if ! type "pixz" > /dev/null; then
-	echo Using parallel compression.. 
-	tar -c "$opts" "$fname" | pixz > "$fname.tar.xz"
-    else
-    	tar -cJf "$fname.tar.xz" "$opts" "$fname"
-    fi
-}
-
-function dumb_lzma() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    tar -c --lzma -f  "$name.tar.lzma" "$opts"
-}
-
-function dumb_bzip2() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    tar -cjf  "$name.tar.bz2" "$opts"
-}
-
-function dumb_7z() {    
-    name=($(parse_name $@))
-    opts="$name[2,-1]"
-    name="$name[1]"
-    echo 7z a -m0=LZMA2  \"$name.tar.7z\" \"$opts\"
-    7z a -m0=LZMA2  "$name.tar.7z" "$opts"
-}
-
-alias tar.7z=dumb_7z
-alias tar.lzma=dumb_lzma
-alias tar.bz2=dumb_bzip2
-alias tar.gz=dumb_gz
-alias tar.xz=dumb_xz
+alias tar.7z="compressor.py -f 7z"
+alias tar.lzma="compressor.py -f lzma"
+alias tar.bz2="compressor.py -f bz2"
+alias tar.gz="compressor.py -f gz"
+alias tar.xz="compressor.py -f xz"
 alias llh="ls -lh"
+
+if [[ -e /usr/share/zsh/site-contrib/powerline.zsh ]]; then
+	# Powerline support is enabled if available, otherwise use a regular PS1
+	. /usr/share/zsh/site-contrib/powerline.zsh
+	VIRTUAL_ENV_DISABLE_PROMPT=true
+fi
+
+##
+# Environment variables
+#
+
+# basedir defaults, in case they're not already set up.
+# http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+if [[ -z "$XDG_DATA_HOME" ]]; then
+	export XDG_DATA_HOME="$HOME/.local/share"
+fi
+
+if [[ -z "$XDG_CONFIG_HOME" ]]; then
+	export XDG_CONFIG_HOME="$HOME/.config"
+fi
+
+if [[ -z "$XDG_CACHE_HOME" ]]; then
+	export XDG_CACHE_HOME="$HOME/.cache"
+fi
+
+if [[ -z "$XDG_DATA_DIRS" ]]; then
+	export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+fi
+
+if [[ -z "$XDG_CONFIG_DIRS" ]]; then
+	export XDG_CONFIG_DIRS="/etc/xdg"
+else
+	export XDG_CONFIG_DIRS="/etc/xdg:$XDG_CONFIG_DIRS"
+fi
+
+# add ~/.config/zsh/completion to completion paths
+# NOTE: this needs to be a directory with 0755 permissions, otherwise you will
+# get "insecure" warnings on shell load!
+fpath=("$XDG_CONFIG_HOME/zsh/completion" $fpath)
+
+
+# Color aliases
+if command -V dircolors >/dev/null 2>&1; then
+	eval "$(dircolors -b)"
+	# Only alias ls colors if dircolors is installed
+	alias ls="ls -F --color=auto"
+	alias dir="dir --color=auto"
+	alias vdir="vdir --color=auto"
+fi
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+# make less accept color codes and re-output them
+alias less="less -R"
+
+# Make ctrl-e edit the current command line
+#autoload edit-command-line
+#zle -N edit-command-line
+#bindkey "^e" edit-command-line
+
+# Make sure the terminal is in application mode, when zle is
+# active. Only then are the values from $terminfo valid.
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+	function zle-line-init {
+		printf "%s" ${terminfo[smkx]}
+	}
+	function zle-line-finish {
+		printf "%s" ${terminfo[rmkx]}
+	}
+	zle -N zle-line-init
+	zle -N zle-line-finish
+fi
+
+# typing ... expands to ../.., .... to ../../.., etc.
+rationalise-dot() {
+	if [[ $LBUFFER = *.. ]]; then
+		LBUFFER+=/..
+	else
+		LBUFFER+=.
+	fi
+}
+zle -N rationalise-dot
+bindkey . rationalise-dot
+bindkey -M isearch . self-insert # history search fix
+
+
+##
+# Aliases
+#
+
+# some more ls aliases
+alias l="ls -CF"
+alias ll="ls -l"
+alias la="ls -A"
+alias lh="ls -lh"
+alias lash="ls -lAsh"
+alias sl="ls"
+
+# Make unified diff syntax the default
+alias diff="diff -u"
+
+# simple webserver
+alias mkhttp="python3 -m http.server"
+
+# json prettify
+alias json="python -m json.tool"
+
+# octal+text permissions for files
+alias perms="stat -c '%A %a %n'"
+
+
+##
+# Functions
+#
+
+# make a backup of a file
+# https://github.com/grml/grml-etc-core/blob/master/etc/zsh/zshrc
+bk() {
+	cp -a "$1" "${1}_$(date --iso-8601=seconds)"
+}
+
+# display a list of supported colors
+function lscolors {
+	((cols = $COLUMNS - 4))
+	s=$(printf %${cols}s)
+	for i in {000..$(tput colors)}; do
+		echo -e $i $(tput setaf $i; tput setab $i)${s// /=}$(tput op);
+	done
+}
+
+# get the content type of an http resource
+function htmime {
+	if [[ -z $1 ]]; then
+		print "USAGE: htmime <URL>"
+		return 1
+	fi
+	mime=$(curl -sIX HEAD $1 | sed -nr "s/Content-Type: (.+)/\1/p")
+	print $mime
+}
+
+# open a web browser on google for a query
+function google {
+	xdg-open "https://www.google.com/search?q=`urlencode "${(j: :)@}"`"
+}
+
+# print a separator banner, as wide as the terminal
+function hr {
+	print ${(l:COLUMNS::=:)}
+}
+
+# launch an app
+function launch {
+	type $1 >/dev/null || { print "$1 not found" && return 1 }
+	$@ &>/dev/null &|
+}
+alias launch="launch " # expand aliases
+
+# urlencode text
+function urlencode {
+	print "${${(j: :)@}//(#b)(?)/%$[[##16]##${match[1]}]}"
+}
+
+# get public ip
+function myip {
+	local api
+	case "$1" in
+		"-4")
+			api="http://v4.ipv6-test.com/api/myip.php"
+			;;
+		"-6")
+			api="http://v6.ipv6-test.com/api/myip.php"
+			;;
+		*)
+			api="http://ipv6-test.com/api/myip.php"
+			;;
+	esac
+	curl -s "$api"
+	echo # Newline.
+}
+
+# Create short urls via http://goo.gl using curl(1).
+# Contributed back to grml zshrc
+# API reference: https://code.google.com/apis/urlshortener/
+function zurl {
+	if [[ -z $1 ]]; then
+		print "USAGE: $0 <URL>"
+		return 1
+	fi
+
+	local url=$1
+	local api="https://www.googleapis.com/urlshortener/v1/url"
+	local data
+
+	# Prepend "http://" to given URL where necessary for later output.
+	if [[ $url != http(s|)://* ]]; then
+		url="http://$url"
+	fi
+	local json="{\"longUrl\": \"$url\"}"
+
+	data=$(curl --silent -H "Content-Type: application/json" -d $json $api)
+	
+	# Match against a regex and print it
+	if [[ $data =~ '"id": "(http://goo.gl/[[:alnum:]]+)"' ]]; then
+		print $match
+	fi
+}
+
+
+
+function +vi-git-stash() {
+	if [[ -s "${hook_com[base]}/.git/refs/stash" ]]; then
+		hook_com[misc]="%{$fg_bold[grey]%}~%{$reset_color%}"
+	fi
+}
+
+precmd() {
+	vcs_info
+}
+
+# Syntax highlighting plugin
+if [[ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# User profile
+if [[ -e "$XDG_CONFIG_HOME/zsh/profile" ]]; then
+	source "$XDG_CONFIG_HOME/zsh/profile"
+fi
+
+# Check if $LANG is badly set as it causes issues
+if [[ $LANG == "C"  || $LANG == "" ]]; then
+	>&2 echo "$fg[red]The \$LANG variable is not set. This can cause a lot of problems.$reset_color"
+fi
