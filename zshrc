@@ -23,6 +23,7 @@ smart_python () {
     fi
 }
 
+alias mmake="nice make -j8"
 alias py=smart_python
 
 smart_python2 () {
@@ -346,3 +347,7 @@ fi
 if [[ $LANG == "C"  || $LANG == "" ]]; then
 	>&2 echo "$fg[red]The \$LANG variable is not set. This can cause a lot of problems.$reset_color"
 fi
+
+mkcd(){
+    mkdir $1 && cd $1
+}

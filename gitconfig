@@ -1,0 +1,75 @@
+[user]
+	email = woggioni@comelz.com
+	name = Walter Oggioni
+[push]
+	default = simple
+[http]
+	sslVerify = true
+
+[diff]  
+    tool = vimdiff  
+    guitool = gvimdiff
+
+[difftool]  
+    prompt = false 
+
+[alias]
+# to save a few keystrokes
+    br = branch -avv
+    co = checkout
+    st = status --column
+    dt = difftool
+    dtg = difftool --  
+    cm = "commit -m"
+## new 'features' 
+## pretty logging: full tree  
+    lg = log --all --graph --abbrev-commit --date=relative  
+# pretty logging: only commits leading to HEAD  
+    lol= log --pretty=oneline --abbrev-commit --graph --decorate  
+# interactive apply patch (hunks)  
+    ipatch = "!f() { git apply $1; git add -p; }; f"  
+# unstage everything  
+    unstage   = reset HEAD  
+# set the working tree as if the last comit hadn't been commited  
+    undo      = reset --soft HEAD^  cosmetics = commit -m 'Cosmetics' 
+# delete all local branches that have been merged but laster  
+    clean-branches = "!f() { git branch --merged | grep -v '^* master$' | grep -v '^  master$' | xargs -r git branch -d ; }; f"  
+# Interactive rebase with the given number of latest commits  
+    reb = "!r() { git rebase -i --autosquash HEAD~$1; }; r"  
+# Commit current stage area, in a commit that will automatically be a fixup in the next interactive rebase  
+    tobesquashed = commit --fixup HEAD 
+
+[status]  
+    relativePaths = true 
+[format]  
+    pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset 
+
+[core]  
+    excludesfile = ~/.gitignore 
+    
+[color "status"]  
+    header    = white dim  
+    branch    = yellow bold  
+    added     = green bold  
+    changed   = red bold  
+    untracked = cyan 
+
+[color "diff"]  
+    meta        = yellow  
+    commit      = green  
+    frag        = magenta  
+    old         = red  
+    new         = green  
+    whitespace  = "red reverse" 
+    
+[credential]  
+    helper = cache --timeout=3600 
+
+[filter "lfs"]  
+    required = true  
+    smudge = git-lfs smudge -- %f  
+    process = git-lfs filter-process  
+    clean = git-lfs clean -- %f 
+
+[rebase]  
+    autosquash = true
