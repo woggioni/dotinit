@@ -8,42 +8,30 @@ bindkey -e
 
 function svndiff () { svn diff $@ | colordiff }
 
+alias mmake="nice make -j8"
+
 # Prefer ipython for interactive shell
 smart_python () {
+    version="$1"
+    shift
     # this function is actually rather dumb
     if [[ -n $1 ]]; then
-        python $argv
+        python${version} $argv
     else
         #if no parameters were given, then assume we want an ipython shell
-        if [[ -n $commands[ipython] ]]; then
-            ipython
+        if [[ -n $commands[ipython${version}] ]]; then
+            ipython${version}
         else
-            python
+            python${version}
         fi
     fi
 }
 
-alias mmake="nice make -j8"
-alias py=smart_python
-
-smart_python2 () {
-    # this function is actually rather dumb
-    if [[ -n $1 ]]; then
-        python2 $argv
-    else
-        #if no parameters were given, then assume we want an ipython shell
-        if [[ -n $commands[ipython] ]]; then
-            ipython2
-        else
-            python2
-        fi
-    fi
-}
-
-alias py2=smart_python2
-
-# tab-complete options for smart_python just like for python
-compdef _python smart_python
+for suffix in '' '3' '2'
+do
+    alias py${suffix}="smart_python \"${suffix}\""
+    compdef _python smart_python${suffix}
+done
 
 # Give us a root shell, or run the command with sudo.
 # Expands command aliases first (cool!)

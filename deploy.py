@@ -12,7 +12,7 @@ files = {
     'astylerc' : '.astylerc',
     'vimrc' : '.vimrc',
     'my_zsh_config.sh' : '.oh-my-zsh/my_zsh_config.sh',
-    'oh_my_zsh.sh' : '.oh-my-zsh/oh_my_zsh.sh',
+    'oh-my-zsh.sh' : '.oh-my-zsh/oh-my-zsh.sh',
     'gitconfig' : '.gitconfig',
 }
 
@@ -25,6 +25,7 @@ def update_symlink(source, destination):
 
 for key, value in files.items():
     destination = join(home, value)
+    makedirs(dirname(destination), exist_ok=True)
     update_symlink(join(cwd, key), destination)
 
 makedirs(join(home, 'bin'), exist_ok=True)
