@@ -1,11 +1,3 @@
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
-HISTSIZE=10000
-SAVEHIST=10000
-setopt appendhistory autocd extendedglob notify
-bindkey -e
-# End of lines configured by zsh-newuser-install
-
 function svndiff () { svn diff $@ | colordiff }
 
 alias mmake="nice make -j8"
@@ -32,6 +24,25 @@ do
     alias py${suffix}="smart_python \"${suffix}\""
     compdef _python smart_python${suffix}
 done
+
+smart_python3 () {
+    # this function is actually rather dumb
+    if [[ -n $1 ]]; then
+        python3 $argv
+    else
+        #if no parameters were given, then assume we want an ipython shell
+        if [[ -n $commands[ipython3] ]]; then
+            ipython3
+        else
+            python3
+        fi
+    fi
+}
+
+alias py3=smart_python3
+
+# tab-complete options for smart_python just like for python
+compdef _python smart_python
 
 # Give us a root shell, or run the command with sudo.
 # Expands command aliases first (cool!)
@@ -334,5 +345,18 @@ fi
 
 mkcd(){
     mkdir $1 && cd $1
+}
+
+bbb() {
+    for pkg in "$@"
+    do
+        pushd "${pkg}"
+        brazil-build build
+        popd
+    done
+}
+
+json_less() {
+    python3 -m json.tool "$@"  | less
 }
 
