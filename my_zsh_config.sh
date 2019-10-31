@@ -71,7 +71,7 @@ extract_archive () {
     local old_dirs current_dirs lower
     lower=${(L)1}
     old_dirs=( *(N/) )
-    if [[ $lower == *.tar.gz || $lower == *.tgz || $lower == *.tar.xz ]]; then
+    if [[ $lower == *.tar.gz || $lower == *.tgz || $lower == *.tar.xz || $lower == *.txz ]]; then
         tar xfv $1
     elif [[ $lower == *.gz ]]; then
         gunzip $1
@@ -360,3 +360,9 @@ json_less() {
     python3 -m json.tool "$@"  | less
 }
 
+bb() {
+    for target in "$@[*]"
+    do
+        brazil-build "$target" || return $?
+    done
+}
