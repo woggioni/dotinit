@@ -1,49 +1,29 @@
-# Lines configured by zsh-newuser-install
-HISTFILE=~/.histfile
-HISTSIZE=10000
-SAVEHIST=10000
-setopt appendhistory autocd extendedglob notify
-bindkey -e
-# End of lines configured by zsh-newuser-install
-
 function svndiff () { svn diff $@ | colordiff }
+
+alias mmake="nice make -j8"
 
 # Prefer ipython for interactive shell
 smart_python () {
+    version="$1"
+    shift
     # this function is actually rather dumb
     if [[ -n $1 ]]; then
-        python $argv
+        python${version} $argv
     else
         #if no parameters were given, then assume we want an ipython shell
-        if [[ -n $commands[ipython] ]]; then
-            ipython
+        if [[ -n $commands[ipython${version}] ]]; then
+            ipython${version}
         else
-            python
+            python${version}
         fi
     fi
 }
 
-alias mmake="nice make -j8"
-alias py=smart_python
-
-smart_python2 () {
-    # this function is actually rather dumb
-    if [[ -n $1 ]]; then
-        python2 $argv
-    else
-        #if no parameters were given, then assume we want an ipython shell
-        if [[ -n $commands[ipython] ]]; then
-            ipython2
-        else
-            python2
-        fi
-    fi
-}
-
-alias py2=smart_python2
-
-# tab-complete options for smart_python just like for python
-compdef _python smart_python
+for suffix in '' '3' '2'
+do
+    alias py${suffix}="smart_python \"${suffix}\""
+    # compdef _python py${suffix}
+done
 
 # Give us a root shell, or run the command with sudo.
 # Expands command aliases first (cool!)
@@ -65,14 +45,14 @@ smart_sudo () {
 }
 
 alias sdo=smart_sudo
-compdef _sudo smart_sudo
+# compdef _sudo smart_sudo
 
 
 extract_archive () {
     local old_dirs current_dirs lower
     lower=${(L)1}
     old_dirs=( *(N/) )
-    if [[ $lower == *.tar.gz || $lower == *.tgz || $lower == *.tar.xz ]]; then
+    if [[ $lower == *.tar.gz || $lower == *.tgz || $lower == *.tar.xz || $lower == *.txz ]]; then
         tar xfv $1
     elif [[ $lower == *.gz ]]; then
         gunzip $1
@@ -105,7 +85,7 @@ extract_archive () {
 }
 
 alias ex=extract_archive
-compdef '_files -g "*.gz *.tgz *.bz2 *.tbz *.zip *.rar *.tar *.lha"' extract_archive    
+# compdef '_files -g "*.gz *.tgz *.bz2 *.tbz *.zip *.rar *.tar *.lha"' extract_archive    
 
 alias tar.7z="compressor.py -f 7z"
 alias tar.lzma="compressor.py -f lzma"
@@ -118,34 +98,6 @@ if [[ -e /usr/share/zsh/site-contrib/powerline.zsh ]]; then
 	# Powerline support is enabled if available, otherwise use a regular PS1
 	. /usr/share/zsh/site-contrib/powerline.zsh
 	VIRTUAL_ENV_DISABLE_PROMPT=true
-fi
-
-##
-# Environment variables
-#
-
-# basedir defaults, in case they're not already set up.
-# http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
-if [[ -z "$XDG_DATA_HOME" ]]; then
-	export XDG_DATA_HOME="$HOME/.local/share"
-fi
-
-if [[ -z "$XDG_CONFIG_HOME" ]]; then
-	export XDG_CONFIG_HOME="$HOME/.config"
-fi
-
-if [[ -z "$XDG_CACHE_HOME" ]]; then
-	export XDG_CACHE_HOME="$HOME/.cache"
-fi
-
-if [[ -z "$XDG_DATA_DIRS" ]]; then
-	export XDG_DATA_DIRS="/usr/local/share:/usr/share"
-fi
-
-if [[ -z "$XDG_CONFIG_DIRS" ]]; then
-	export XDG_CONFIG_DIRS="/etc/xdg"
-else
-	export XDG_CONFIG_DIRS="/etc/xdg:$XDG_CONFIG_DIRS"
 fi
 
 # add ~/.config/zsh/completion to completion paths
@@ -329,18 +281,9 @@ function +vi-git-stash() {
 	fi
 }
 
-precmd() {
-	vcs_info
-}
-
 # Syntax highlighting plugin
 if [[ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
 	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-
-# User profile
-if [[ -e "$XDG_CONFIG_HOME/zsh/profile" ]]; then
-	source "$XDG_CONFIG_HOME/zsh/profile"
 fi
 
 # Check if $LANG is badly set as it causes issues
@@ -350,4 +293,8 @@ fi
 
 mkcd(){
     mkdir $1 && cd $1
+}
+
+json_less() {
+    python3 -m json.tool "$@"  | less
 }

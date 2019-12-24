@@ -5,15 +5,17 @@ from os import symlink, environ, makedirs, remove
 
 user = environ['USER']
 home = environ['HOME']
+config = environ.get('XDG_CONFIG_HOME', join(home, '.config'))
 cwd = abspath(dirname(__file__))
 
 files = {
     'gdbinit' : '.gdbinit',
     'astylerc' : '.astylerc',
     'vimrc' : '.vimrc',
-    'my_zsh_config.sh' : '.oh-my-zsh/my_zsh_config.sh',
-    'oh-my-zsh.sh' : '.oh-my-zsh/oh-my-zsh.sh',
     'gitconfig' : '.gitconfig',
+    'zshrc.sh' : '.zshrc',
+    'zshenv.sh' : '.zshenv',
+    'zsh_profile.sh' : join(config, 'zsh/profile'),
 }
 
 def update_symlink(source, destination):
