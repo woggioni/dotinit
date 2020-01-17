@@ -7,4 +7,4 @@ export XDG_CONFIG_DIRS="/etc/xdg:$XDG_CONFIG_DIRS"
 
 #export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dsun.java2d.opengl=true'
 export EDITOR=vim
-export PATH=$HOME/bin:$HOME/.nimble/bin:$PATH
+export PATH=$HOME/bin:$HOME/.local/bin:$HOME/.nimble/bin:$PATH

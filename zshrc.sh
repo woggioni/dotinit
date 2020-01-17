@@ -10,7 +10,7 @@ export ZSH=/usr/share/oh-my-zsh
 ZSH_THEME="agnoster"
 
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-        source /etc/profile.d/vte-2.91.sh
+        source /etc/profile.d/vte.sh
 fi
 
 source $ZSH/oh-my-zsh.sh
