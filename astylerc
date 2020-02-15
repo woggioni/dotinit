@@ -4,7 +4,7 @@
 # 
 
 # Use K&R formatting style
-style=allman
+style=java
     
 # Indent class and struct blocks so that the blocks 'public', 'private' and
 # 'protected' are indented. This option is effective in C++ files only
@@ -41,7 +41,7 @@ style=allman
 #         break;
 #     }
 # }
-#indent-switches
+indent-switches
     
 # Indent C++ namespaces (this option has no effect on other file types)
 # Add extra indentation to namespace blocks.
