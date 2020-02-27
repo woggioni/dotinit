@@ -298,3 +298,21 @@ mkcd(){
 json_less() {
     python3 -m json.tool "$@"  | less
 }
+
+gradlew() {
+    local folder="."
+    while true
+    do
+        if [ -f "${folder}/gradlew" ]
+        then
+            "${folder}/gradlew" $@
+            return $?
+        elif [[ "${folder}" ==  "/" ]]
+        then
+            gradle $@
+            return $?
+        else
+            folder=$(realpath "${folder}/../")
+        fi
+    done
+}
