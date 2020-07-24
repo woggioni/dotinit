@@ -316,3 +316,12 @@ gradlew() {
         fi
     done
 }
+
+gradlew8() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-8-openjdk $@
+}
+
+gradlew11() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-11-openjdk $@
+}
+
