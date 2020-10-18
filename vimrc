@@ -5,6 +5,9 @@ set mousemodel=extend
 set ignorecase smartcase
 set tabstop=4 softtabstop=4 expandtab shiftwidth=4 smarttab
 
+if has('python3')
+endif
+
 if has('unnamedplus')
   " By default, Vim will not use the system clipboard when yanking/pasting to
   " the default register. This option makes Vim use the system default
