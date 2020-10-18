@@ -305,11 +305,11 @@ gradlew() {
     do
         if [ -f "${folder}/gradlew" ]
         then
-            "${folder}/gradlew" $@
+            "${folder}/gradlew" "$@"
             return $?
         elif [[ "${folder}" ==  "/" ]]
         then
-            gradle $@
+            gradle "$@"
             return $?
         else
             folder=$(realpath "${folder}/../")
