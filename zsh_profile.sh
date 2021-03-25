@@ -352,3 +352,23 @@ DebugTestNode() {
         return -1
     fi
 }
+
+RunTestNode11() {
+    if [ -n "$1" ]
+    then
+        (cd build/nodes/$1 && rlwrap -H ~/.crash_history -a /usr/lib/jvm/java-11-openjdk/bin/java -jar corda.jar)
+    else
+        >&2 echo "This function needs the node name as the first command line argument"
+        return -1
+    fi
+}
+
+DebugTestNode11() {
+    if [ -n "$1" ]
+    then
+        (cd build/nodes/$1 && rlwrap -H ~/.crash_history -a /usr/lib/jvm/java-11-openjdk/bin/java -Dcapsule.jvm.args="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=$2" -jar corda.jar)
+    else
+        >&2 echo "This function needs the node name as the first command line argument and the debug port number as second argument"
+        return -1
+    fi
+}
