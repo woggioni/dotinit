@@ -19,6 +19,7 @@ files = {
     'fish/functions/gradlew8.fish': '.config/fish/functions/gradlew8.fish',
     'fish/functions/gradlew11.fish': '.config/fish/functions/gradlew11.fish',
     'fish/functions/gradlew17.fish': '.config/fish/functions/gradlew17.fish',
+    'fish/functions/gradlew21.fish': '.config/fish/functions/gradlew21.fish',
     'fish/functions/mkcd.fish': '.config/fish/functions/mkcd.fish',
 }
 

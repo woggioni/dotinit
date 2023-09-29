@@ -325,6 +325,14 @@ gradlew11() {
     gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-11-openjdk $@
 }
 
+gradlew17() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-17-openjdk $@
+}
+
+gradlew21() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-21-openjdk $@
+}
+
 gradlew-j9-8() {
     gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-8-j9 $@
 }
