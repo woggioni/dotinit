@@ -329,8 +329,16 @@ gradlew17() {
     gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-17-openjdk $@
 }
 
+gradlew17graal() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-17-graalvm $@
+}
+
 gradlew21() {
     gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-21-openjdk $@
+}
+
+gradlew21graal() {
+    gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-21-graalvm $@
 }
 
 gradlew-j9-8() {
