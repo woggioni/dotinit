@@ -21,6 +21,8 @@ files = {
     'fish/functions/gradlew17.fish': '.config/fish/functions/gradlew17.fish',
     'fish/functions/gradlew21.fish': '.config/fish/functions/gradlew21.fish',
     'fish/functions/mkcd.fish': '.config/fish/functions/mkcd.fish',
+    'config.nu': '.config/nushell/config.nu',
+    'helix/config.toml': '.config/helix/config.toml'
 }
 
 

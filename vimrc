@@ -32,4 +32,4 @@ set autoindent
 set cindent
 set history=1000
 set undolevels=1000
-
+"set directory=$HOME/.cache/vim/swap/
